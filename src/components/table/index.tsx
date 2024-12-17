@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import statuses from "./statuses.json";
 
 import {
@@ -24,6 +24,8 @@ import {
 import { OptionSelect } from "../ui/select";
 import TableFilter from "./table-filter";
 import { ArrowDown, ArrowUp } from "lucide-react";
+import { Contract } from "../../lib/types";
+import useContract from "@/hooks/useContract";
 
 const SortButton = (props: { column: Column<any, unknown> }) => {
   const { getIsSorted } = props.column;
@@ -50,12 +52,6 @@ const SortButton = (props: { column: Column<any, unknown> }) => {
       </label>
     </div>
   );
-};
-
-type Contract = {
-  id: string;
-  name: string;
-  status: string;
 };
 
 const defaultData: Contract[] = [
@@ -101,7 +97,9 @@ const columns = [
 ];
 
 function ReactTable() {
-  const [data, _setData] = useState(() => [...defaultData]);
+  const [data, _setData] = useState([]);
+
+  const { getAll } = useContract();
 
   const table = useReactTable({
     data,
@@ -110,6 +108,13 @@ function ReactTable() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   });
+
+  useEffect(() => {
+    (async () => {
+      const data = await getAll();
+      _setData(data);
+    })();
+  }, []);
 
   return (
     <div className="p-5 w-full">

@@ -149,13 +149,14 @@ export function OptionSelect(
   props: {
     selected?: string;
     opts?: { id: string; title: string }[];
+    placeholder?: string;
   } & SelectPrimitive.SelectProps
 ) {
-  const { opts = [], selected = "", ...selectProps } = props;
+  const { opts = [], selected = "", placeholder, ...selectProps } = props;
   return (
     <Select defaultValue={selected} {...selectProps}>
       <SelectTrigger className="w-full">
-        <SelectValue />
+        <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>

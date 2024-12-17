@@ -55,7 +55,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
-export function ButtonLoading(props: { loading: boolean } & ButtonProps) {
+export function ButtonLoading(props: { loading?: boolean } & ButtonProps) {
   const { loading, children, ...buttonProps } = props;
   return (
     <Button disabled={loading} {...buttonProps}>
