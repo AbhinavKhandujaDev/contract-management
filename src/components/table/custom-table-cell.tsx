@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { OptionSelect } from "../ui/select";
 import { Input } from "../ui/input";
 import statuses from "./statuses.json";
-import { CellContext, Column, ColumnDef } from "@tanstack/react-table";
+import { CellContext } from "@tanstack/react-table";
 import { Contract } from "@/lib/types";
-import { Button, ButtonLoading } from "../ui/button";
-import { DeleteIcon, Trash } from "lucide-react";
+import { ButtonLoading } from "../ui/button";
+import { Trash } from "lucide-react";
 import useContract from "@/hooks/useContract";
 
 const placeholders: any = {

@@ -99,22 +99,11 @@ function ReactTable() {
     getFilteredRowModel: getFilteredRowModel(),
     meta: {
       updateData: (rowIndex, columnId, value) => {
-        if (columnId === "action") {
-          setData((prev) => {
-            const temp = [...prev];
-            temp.splice(rowIndex, 1);
-            return temp;
-          });
-          return;
-        }
+        if (columnId === "action") return;
+
         const row = data[rowIndex];
         const { id } = row;
         update(id, { [columnId]: value });
-        setData((prev) => {
-          const temp = [...prev];
-          temp[rowIndex] = { ...temp[rowIndex], [columnId]: value };
-          return temp;
-        });
       },
     },
   });
@@ -138,7 +127,7 @@ function ReactTable() {
         if (type === "upd") {
           const contract = data as Contract;
           setData((prev) => {
-            const temp = prev;
+            const temp = [...prev];
             const idx = temp.findIndex(({ id }) => id === contract.id);
             temp[idx] = contract;
             return temp;
@@ -147,7 +136,7 @@ function ReactTable() {
         if (type === "del") {
           const contractId = data as string;
           setData((prev) => {
-            const temp = prev;
+            const temp = [...prev];
             const idx = temp.findIndex(({ id }) => id === contractId);
             temp.splice(idx, 1);
             return temp;

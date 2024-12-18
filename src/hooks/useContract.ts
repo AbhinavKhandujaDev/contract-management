@@ -1,5 +1,4 @@
 import { Contract } from "@/lib/types";
-import { useEffect } from "react";
 
 const sessionId = `${Math.random() * 10000}`;
 
@@ -8,7 +7,8 @@ socketUrl.searchParams.set("sessionId", String(parseInt(sessionId)));
 const socket = new WebSocket(socketUrl);
 
 function sendMessage(message: any) {
-  // socket?.send(JSON.stringify(message));
+  if (!socket.OPEN) return;
+  socket?.send(JSON.stringify(message));
 }
 
 const useContract = () => {

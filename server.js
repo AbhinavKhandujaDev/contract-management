@@ -1,10 +1,5 @@
-// import { createServer } from "http";
-// import { parse } from "url";
-// import next from "next";
-
 const { WebSocketServer } = require("ws");
 const { createServer } = require("http");
-const { parse } = require("url");
 const next = require("next");
 
 const dev = process.env.NODE_ENV !== "production";
