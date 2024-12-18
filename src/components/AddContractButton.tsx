@@ -28,7 +28,7 @@ export function AddContractButton(props: { isAdd?: boolean; data?: Contract }) {
   const { isAdd, data } = props;
   const { name = "", status = defStatus } = data || {};
 
-  const { add, update } = useContract();
+  const { add } = useContract();
 
   const formRef = useRef({ name, status });
 

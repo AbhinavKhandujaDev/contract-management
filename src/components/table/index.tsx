@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import statuses from "./statuses.json";
 
 import {
   Column,
@@ -10,6 +9,7 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
+  RowData,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -21,11 +21,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { OptionSelect } from "../ui/select";
 import TableFilter from "./table-filter";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { Contract } from "../../lib/types";
 import useContract from "@/hooks/useContract";
+import CustomTableCell from "./custom-table-cell";
+
+declare module "@tanstack/react-table" {
+  interface TableMeta<TData extends RowData> {
+    updateData: (rowIndex: number, columnId: string, value: unknown) => void;
+  }
+}
 
 const SortButton = (props: { column: Column<any, unknown> }) => {
   const { getIsSorted } = props.column;
@@ -54,24 +60,6 @@ const SortButton = (props: { column: Column<any, unknown> }) => {
   );
 };
 
-const defaultData: Contract[] = [
-  {
-    id: "1",
-    name: "Rahul Mahajan",
-    status: "1",
-  },
-  {
-    id: "2",
-    name: "Ajay Juneja",
-    status: "1",
-  },
-  {
-    id: "3",
-    name: "Abhinav Khanduja",
-    status: "2",
-  },
-];
-
 const columnHelper = createColumnHelper<Contract>();
 
 const columns = [
@@ -82,24 +70,20 @@ const columns = [
   }),
   columnHelper.accessor("name", {
     id: "name",
-    cell: (info) => <i>{info.getValue()}</i>,
+    cell: (info) => <CustomTableCell {...info} />,
     header: () => <span className="font-extrabold">Client Name</span>,
   }),
   columnHelper.accessor("status", {
     header: () => <span className="font-extrabold">Status</span>,
-    cell: (info) => (
-      <div>
-        <OptionSelect selected={info.getValue()} opts={statuses} />
-      </div>
-    ),
+    cell: (info) => <CustomTableCell {...info} />,
     footer: (info) => info.column.id,
   }),
 ];
 
 function ReactTable() {
-  const [data, _setData] = useState([]);
+  const [data, setData] = useState<Contract[]>([]);
 
-  const { getAll } = useContract();
+  const { getAll, socket, update } = useContract();
 
   const table = useReactTable({
     data,
@@ -107,13 +91,58 @@ function ReactTable() {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    meta: {
+      updateData: (rowIndex, columnId, value) => {
+        const row = data[rowIndex];
+        const { id } = row;
+        update(id, { [columnId]: value });
+        setData((prev) => {
+          const temp = [...prev];
+          temp[rowIndex] = { ...temp[rowIndex], [columnId]: value };
+          return temp;
+        });
+      },
+    },
   });
 
   useEffect(() => {
     (async () => {
       const data = await getAll();
-      _setData(data);
+      setData(data);
     })();
+
+    if (!socket) return;
+    socket.onmessage = (evt: any) => {
+      try {
+        const json = JSON.parse(evt.data);
+        const { data, type } = json;
+
+        if (type === "add") {
+          const contract = data as Contract;
+          setData((prev) => [...prev, contract]);
+        }
+        if (type === "upd") {
+          const contract = data as Contract;
+          setData((prev) => {
+            const temp = prev;
+            const idx = temp.findIndex(({ id }) => id === contract.id);
+            temp[idx] = contract;
+            return temp;
+          });
+        }
+        if (type === "del") {
+          const contractId = data as string;
+          setData((prev) => {
+            const temp = prev;
+            const idx = temp.findIndex(({ id }) => id === contractId);
+            temp.splice(idx, 1);
+            return temp;
+          });
+        }
+      } catch (error) {}
+    };
+
+    return () => socket.close();
   }, []);
 
   return (

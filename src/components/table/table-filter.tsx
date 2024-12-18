@@ -11,7 +11,7 @@ const placeholders: any = {
 };
 
 const TableFilter = (props: { column: Column<any, unknown> }) => {
-  const { id, setFilterValue, getIsSorted } = props.column;
+  const { id, setFilterValue } = props.column;
   if (id === "id" || id === "name") {
     return (
       <Input

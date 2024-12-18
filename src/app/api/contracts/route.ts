@@ -28,14 +28,15 @@ export async function PUT(req: NextRequest) {
 
   const idx = contracts.findIndex(({ id }) => id === contractId);
   contracts[idx] = { ...contracts[idx], ...body };
-  return NextResponse.json(contracts);
+
+  return NextResponse.json({ success: true, data: contracts[idx] });
 }
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  contracts.push({ id: contracts.length + 1, ...body });
+  const contract = { id: contracts.length + 1, ...body };
+  contracts.push(contract);
 
-  return NextResponse.json({ success: true });
-  // return NextResponse.json({ success: false }, { status: 400 });
+  return NextResponse.json({ success: true, data: contract });
 }
 export async function DELETE(req: NextRequest) {
   const urlSearchParams = new URLSearchParams(req.nextUrl.search);
@@ -45,5 +46,5 @@ export async function DELETE(req: NextRequest) {
 
   contracts.splice(idx, 1);
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, data: contractId });
 }
