@@ -78,6 +78,12 @@ const columns = [
     cell: (info) => <CustomTableCell {...info} />,
     footer: (info) => info.column.id,
   }),
+  {
+    id: "action",
+    header: () => <span className="font-extrabold">Action</span>,
+    // accessor: "dummy", // This is a dummy column
+    cell: (info: any) => <CustomTableCell {...info} />,
+  },
 ];
 
 function ReactTable() {
@@ -93,6 +99,14 @@ function ReactTable() {
     getFilteredRowModel: getFilteredRowModel(),
     meta: {
       updateData: (rowIndex, columnId, value) => {
+        if (columnId === "action") {
+          setData((prev) => {
+            const temp = [...prev];
+            temp.splice(rowIndex, 1);
+            return temp;
+          });
+          return;
+        }
         const row = data[rowIndex];
         const { id } = row;
         update(id, { [columnId]: value });

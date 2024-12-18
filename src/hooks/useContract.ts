@@ -47,9 +47,9 @@ const useContract = () => {
     return resdata;
   };
 
-  useEffect(() => {
-    return () => socket?.close();
-  }, []);
+  // useEffect(() => {
+  //   return () => socket?.close();
+  // }, []);
 
   return { getAll, add, update, del, socket };
 };
